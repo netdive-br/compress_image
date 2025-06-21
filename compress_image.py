@@ -25,6 +25,12 @@ def calcular_hash(caminho):
     return h.hexdigest()
 
 
+def adicionar_sufixo_web(nome_arquivo):
+    """Adiciona sufixo '_web' antes da extensão."""
+    nome, ext = os.path.splitext(nome_arquivo)
+    return f"{nome}_web{ext}"
+
+
 def comprimir_imagens(pasta_origem):
     pasta_web = os.path.join(pasta_origem, "WEB")
     os.makedirs(pasta_web, exist_ok=True)
@@ -44,7 +50,8 @@ def comprimir_imagens(pasta_origem):
     print(f"\n🔧 Iniciando compressão de {len(arquivos)} imagens na pasta: {pasta_origem}\n")
     for arquivo in tqdm(arquivos, desc="Comprimindo imagens", unit="img"):
         caminho_arquivo = os.path.join(pasta_origem, arquivo)
-        destino = os.path.join(pasta_web, arquivo)
+        nome_comprimido = adicionar_sufixo_web(arquivo)
+        destino = os.path.join(pasta_web, nome_comprimido)
 
         try:
             hash_img = calcular_hash(caminho_arquivo)
@@ -53,11 +60,11 @@ def comprimir_imagens(pasta_origem):
                 imagem_base = hashes[hash_img]
                 origem = os.path.join(pasta_web, imagem_base)
                 shutil.copyfile(origem, destino)
-                tqdm.write(f"🔁 {arquivo} é duplicata de {imagem_base} — copiado.")
+                tqdm.write(f"🔁 {arquivo} é duplicata — copiado como {nome_comprimido}.")
             else:
                 source = tinify.from_file(caminho_arquivo)
                 source.to_file(destino)
-                hashes[hash_img] = arquivo
+                hashes[hash_img] = nome_comprimido
 
         except tinify.errors.AccountError:
             print("\n❌ Erro: chave da API inválida ou limite excedido.")
