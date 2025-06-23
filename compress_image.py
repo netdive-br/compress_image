@@ -36,16 +36,21 @@ def comprimir_imagens(pasta_origem):
     os.makedirs(pasta_web, exist_ok=True)
 
     extensoes = (".jpg", ".jpeg", ".png")
-    arquivos = [
-        f for f in os.listdir(pasta_origem)
-        if f.lower().endswith(extensoes) and os.path.isfile(os.path.join(pasta_origem, f))
-    ]
+    arquivos = sorted([
+    f for f in os.listdir(pasta_origem)
+    if f.lower().endswith(extensoes) and os.path.isfile(os.path.join(pasta_origem, f))
+    ])
+
 
     if not arquivos:
         print("Nenhuma imagem encontrada para compressão.")
         return
 
     hashes = {}
+
+    total_economia = 0
+    total_original = 0
+    total_final = 0
 
     print(f"\n🔧 Iniciando compressão de {len(arquivos)} imagens na pasta: {pasta_origem}\n")
     for arquivo in tqdm(arquivos, desc="Comprimindo imagens", unit="img"):
@@ -54,17 +59,30 @@ def comprimir_imagens(pasta_origem):
         destino = os.path.join(pasta_web, nome_comprimido)
 
         try:
+            tamanho_original = os.path.getsize(caminho_arquivo)
             hash_img = calcular_hash(caminho_arquivo)
 
             if hash_img in hashes:
                 imagem_base = hashes[hash_img]
                 origem = os.path.join(pasta_web, imagem_base)
                 shutil.copyfile(origem, destino)
+                tamanho_comprimido = os.path.getsize(destino)
                 tqdm.write(f"🔁 {arquivo} é duplicata — copiado como {nome_comprimido}.")
             else:
                 source = tinify.from_file(caminho_arquivo)
                 source.to_file(destino)
+                tamanho_comprimido = os.path.getsize(destino)
                 hashes[hash_img] = nome_comprimido
+
+            economia = tamanho_original - tamanho_comprimido
+            total_economia += economia
+            total_original += tamanho_original
+            total_final += tamanho_comprimido
+
+            tqdm.write(
+                f"📉 {arquivo}: {tamanho_original / 1024:.1f} KB → {tamanho_comprimido / 1024:.1f} KB "
+                f"(economia: {economia / 1024:.1f} KB)"
+            )
 
         except tinify.errors.AccountError:
             print("\n❌ Erro: chave da API inválida ou limite excedido.")
@@ -75,6 +93,10 @@ def comprimir_imagens(pasta_origem):
             print(f"\n⚠️ Erro inesperado no arquivo {arquivo}: {e}")
 
     print(f"\n✅ Compressão concluída! Arquivos otimizados salvos em: {pasta_web}")
+    print(f"\n📊 Tamanho total original: {total_original / 1024:.1f} KB")
+    print(f"📦 Tamanho total comprimido: {total_final / 1024:.1f} KB")
+    print(f"💰 Economia total: {total_economia / 1024:.1f} KB "
+          f"({(total_economia / total_original * 100):.1f}% de redução)")
 
 
 if __name__ == "__main__":
