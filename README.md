@@ -36,14 +36,14 @@ Este repositório contém dois utilitários em **Python** para tratamento de ima
 * Dependências listadas em `requirements.txt`
 
 ```
-tinify
-tqdm
-python-dotenv
-pillow
-pillow-heif
+pillow==11.2.1
+pillow_heif==0.22.0
+python-dotenv==1.1.0
+tinify==1.7.0
+tqdm==4.67.1
 ```
 
-* Conta na [API do TinyPNG](https://tinypng.com/developers) (necessária para compressão)
+> 🔎 Obs: Dependências como `requests`, `certifi` etc. são instaladas automaticamente, não precisam ser listadas manualmente.
 
 ---
 
@@ -66,15 +66,19 @@ pip install -r requirements.txt
 
 ---
 
-## 🔑 Configuração da API (TinyPNG)
+## 🔑 Como obter a chave da API do TinyPNG
 
-Crie um arquivo **`.env`** na raiz do projeto com sua chave da API:
+1. Acesse [https://tinypng.com/developers](https://tinypng.com/developers).
+2. Clique em **Get your API key**.
+3. Cadastre-se com um e-mail válido.
+4. Você receberá sua chave de API (algo como `qJ3F4xAbCdEfGhIjKlMnOpQrStUvWxYz`).
+5. O plano gratuito permite **até 500 compressões por mês**.
+
+Crie um arquivo **`.env`** na raiz do projeto com a chave:
 
 ```
 TINIFY_API_KEY=SUACHAVEAQUI
 ```
-
-> ⚠️ **Importante:** não compartilhe sua chave em repositórios públicos.
 
 ---
 
