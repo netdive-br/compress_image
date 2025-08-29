@@ -1,24 +1,49 @@
-# 🖼️ Compress Image - Otimizador de Imagens com TinyPNG
+# 🖼️ Image Tools - Conversão e Compressão de Imagens
 
-Este projeto é um script em **Python** para **compressão automática de imagens** (JPG e PNG) utilizando a API do [TinyPNG](https://tinypng.com/developers).
-Ele otimiza imagens em lote, evita duplicatas através de **hash SHA256** e organiza os arquivos comprimidos em uma pasta separada.
+Este repositório contém dois utilitários em **Python** para tratamento de imagens:
+
+1. **Conversão HEIC → JPEG** (`convert_heic_jpeg.py`)
+
+   * Ideal para usuários de iPhone/Apple que recebem fotos em formato **HEIC/HEIF**.
+
+2. **Compressão JPEG/PNG com TinyPNG** (`compress_image.py`)
+
+   * Otimiza imagens, reduzindo o tamanho dos arquivos sem perda significativa de qualidade.
 
 ---
 
 ## 🚀 Funcionalidades
 
-* 🔧 Compressão de imagens em lote (JPG/JPEG/PNG)
-* 📉 Redução de tamanho mantendo a qualidade
-* 🔁 Detecção de imagens duplicadas para evitar compressão repetida
-* 📂 Criação automática da pasta `WEB` para armazenar imagens otimizadas
-* 📊 Relatório final com economia total de espaço
+### `convert_heic_jpeg.py`
+
+* Converte imagens **.heic / .heif** para **.jpg**
+* Mantém boa qualidade (95%)
+* Otimiza o arquivo final
+* Salva o `.jpg` na mesma pasta da imagem original
+
+### `compress_image.py`
+
+* Comprime imagens **JPG/JPEG/PNG** usando a API do [TinyPNG](https://tinypng.com/developers)
+* Evita compressão repetida de imagens duplicadas (usa hash SHA256)
+* Cria uma pasta `WEB/` para armazenar os arquivos otimizados
+* Gera relatório com estatísticas de economia de espaço
 
 ---
 
 ## 📦 Requisitos
 
 * Python **3.8+**
-* Conta na [API do TinyPNG](https://tinypng.com/developers) (plano gratuito inclui **500 compressões por mês**)
+* Dependências listadas em `requirements.txt`
+
+```
+tinify
+tqdm
+python-dotenv
+pillow
+pillow-heif
+```
+
+* Conta na [API do TinyPNG](https://tinypng.com/developers) (necessária para compressão)
 
 ---
 
@@ -27,65 +52,80 @@ Ele otimiza imagens em lote, evita duplicatas através de **hash SHA256** e orga
 Clone o repositório e instale as dependências:
 
 ```bash
-git clone https://github.com/seu-usuario/compress-image.git
-cd compress-image
+git clone https://github.com/seu-usuario/image-tools.git
+cd image-tools
 
-# Crie um ambiente virtual (opcional, mas recomendado)
+# Criar ambiente virtual (opcional, mas recomendado)
 python -m venv venv
 source venv/bin/activate   # Linux / macOS
 venv\Scripts\activate      # Windows
 
-# Instale as dependências
+# Instalar dependências
 pip install -r requirements.txt
-```
-
-### 📑 Arquivo `requirements.txt`
-
-Se ainda não existir, crie um arquivo com o seguinte conteúdo:
-
-```
-tinify
-tqdm
-python-dotenv
 ```
 
 ---
 
-## 🔑 Configuração da API
+## 🔑 Configuração da API (TinyPNG)
 
-Crie um arquivo **`.env`** na raiz do projeto com sua chave da API do TinyPNG:
+Crie um arquivo **`.env`** na raiz do projeto com sua chave da API:
 
 ```
 TINIFY_API_KEY=SUACHAVEAQUI
 ```
 
-> ⚠️ **Importante:** nunca compartilhe sua chave da API em repositórios públicos.
+> ⚠️ **Importante:** não compartilhe sua chave em repositórios públicos.
 
 ---
 
 ## ▶️ Uso
 
-### 1. Executar diretamente
+### 1. Conversor HEIC → JPEG
 
 ```bash
-python compress_image.py /caminho/para/sua/pasta
+python convert_heic_jpeg.py /caminho/para/as/imagens
 ```
 
-### 2. Caso não informe o caminho
+📂 Estrutura antes/depois:
 
-O programa pedirá que você digite manualmente o caminho da pasta com imagens.
+```
+imagens/
+│── foto1.heic
+│── foto2.heic
+```
+
+⬇️ Após conversão:
+
+```
+imagens/
+│── foto1.heic
+│── foto1.jpg
+│── foto2.heic
+│── foto2.jpg
+```
 
 ---
 
-## 📂 Estrutura do resultado
+### 2. Compressor de Imagens (TinyPNG)
 
-Supondo que sua pasta seja `imagens/`, após a execução será criada:
+```bash
+python compress_image.py /caminho/para/as/imagens
+```
+
+📂 Estrutura antes:
 
 ```
 imagens/
 │── foto1.jpg
 │── foto2.png
-│── ...
+```
+
+⬇️ Após compressão:
+
+```
+imagens/
+│── foto1.jpg
+│── foto2.png
 │── WEB/
     ├── foto1_web.jpg
     ├── foto2_web.png
@@ -93,7 +133,7 @@ imagens/
 
 ---
 
-## 📊 Exemplo de saída
+## 📊 Exemplo de saída do compressor
 
 ```
 🔧 Iniciando compressão de 3 imagens na pasta: imagens/
@@ -113,11 +153,14 @@ imagens/
 
 ## ⚠️ Possíveis erros
 
-* **❌ Erro: chave da API inválida ou limite excedido.**
-  → Verifique sua chave no `.env` ou se já atingiu o limite de compressões gratuitas.
+* **`❌ Erro: chave da API inválida ou limite excedido`**
+  → Verifique sua chave no `.env` ou se já atingiu o limite gratuito de 500 imagens/mês.
 
-* **⚠️ Erro no arquivo X:**
-  → Pode indicar formato não suportado ou arquivo corrompido.
+* **`❌ Falha ao converter arquivo.heic`**
+  → Pode indicar arquivo corrompido ou incompatível.
+
+* **`Nenhuma imagem encontrada`**
+  → Verifique se a pasta contém arquivos suportados.
 
 ---
 
